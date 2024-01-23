@@ -1,37 +1,43 @@
-//
-// Created by Allir on 17.01.2024.
-//
-
 #ifndef PROJEKT1_LOGGER_H
 #define PROJEKT1_LOGGER_H
 #include <thread>
 #include <semaphore>
 #include <iostream>
+#include <vector>
+#include <atomic>
+#include <csignal>
+#include <ctime>
+#include <iomanip>
 
-enum Action{
-    IDLE,
-    HANDLE_SIGNAL,
-    DUMP,
-    CHANGE_MODE,
-    KILL_THREAD
-};
+#define LOG_MAX 255
+#define LOG_STD 125
+#define LOG_MIN 10
 
-
-struct StructThreadData{
-    std::binary_semaphore* mainSemaphore;
-    Action action;
-    int signal;
-    int signalData;
-
+struct SigStruct{
+    std::atomic<int> signalData;
+    std::counting_semaphore<100>* signalSemaphore;
 };
 
 class Logger {
 public:
     Logger();
     ~Logger();
+    SigStruct signal_SIGUSR1;//DUMP
+    SigStruct signal_SIGUSR2;//ON OFF
+    SigStruct signal_SIGCONT;//CHANGE MODE
+    std::binary_semaphore* criticalSemaphore;
+    bool logging;
+    int mode;
+    bool work;
+    FILE* loggingFile;
+
+    //public usage functions
+    static void NewLogEntry(const char* message,int priority);
+
 private:
-    std::thread *handle;
-    StructThreadData threadData;
+    std::thread *handle_USR1,*handle_USR2,*handle_CONT;
+    std::string GetCurrentDateAndTime();
+
 
 };
 
