@@ -1,4 +1,3 @@
-#File Logger in project 1
+# File Logger + Cron
 
-
-#cron in project 2
+file logger is done in project1 folder and cron in folder2 
